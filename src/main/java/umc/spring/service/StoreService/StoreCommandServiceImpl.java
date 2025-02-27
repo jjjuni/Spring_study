@@ -25,12 +25,10 @@ public class StoreCommandServiceImpl implements StoreCommandService{
     public Store addStore(StoreRequestDTO.AddStoreDTO request) {
 
         Store newStore = StoreConverter.toStore(request);
-        Region region = regionRepository.findById(Long.valueOf(request.getRegionId()))
+        Region region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new ErrorHandler(ErrorStatus.REGION_NOT_FOUND));
-        String address = request.getAddress();
 
         newStore.setRegion(region);
-        newStore.setAddress(address);
 
         return storeRepository.save(newStore);
     }

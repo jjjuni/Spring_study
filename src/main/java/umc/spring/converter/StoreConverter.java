@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 
 public class StoreConverter {
 
-    public static StoreResponseDTO.addStoreDTO toAddStoreResultDTO(Store store) {
-        return StoreResponseDTO.addStoreDTO.builder()
-                .storeId((store.getId()))
+    public static StoreResponseDTO.AddStoreResultDTO toAddStoreResultDTO(Store store) {
+        return StoreResponseDTO.AddStoreResultDTO.builder()
+                .storeId(store.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -19,6 +19,7 @@ public class StoreConverter {
 
         return Store.builder()
                 .name(request.getName())
+                .address(request.getAddress())
                 .build();
     }
 }

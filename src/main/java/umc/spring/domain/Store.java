@@ -7,6 +7,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import umc.spring.domain.common.BaseEntity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,6 @@ public class Store extends BaseEntity {
 
     @ColumnDefault("0")
     private Float score;
-
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
