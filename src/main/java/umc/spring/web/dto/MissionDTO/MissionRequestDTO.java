@@ -2,10 +2,6 @@ package umc.spring.web.dto.MissionDTO;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import umc.spring.validation.annotation.ExistCategories;
-
-import java.time.LocalDate;
-import java.util.List;
 
 public class MissionRequestDTO {
 
@@ -18,5 +14,14 @@ public class MissionRequestDTO {
         Integer reward;
         @NotNull
         String missionSpec;
+    }
+
+    @Getter
+    public static class ChallengeMissionDTO{
+
+        @NotNull
+        Long memberId;
+        @NotNull
+        Long missionId;
     }
 }
