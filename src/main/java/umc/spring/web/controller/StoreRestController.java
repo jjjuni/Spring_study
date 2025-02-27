@@ -21,7 +21,7 @@ public class StoreRestController {
 
     private final StoreCommandService storeCommandService;
 
-    @PostMapping("/add")
+    @PostMapping("")
     public ApiResponse<StoreResponseDTO.AddStoreResultDTO> join(@RequestBody @Valid StoreRequestDTO.AddStoreDTO request){
         Store store = storeCommandService.addStore(request);
         return ApiResponse.onSuccess(StoreConverter.toAddStoreResultDTO(store));

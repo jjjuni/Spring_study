@@ -64,7 +64,7 @@ public class Member extends BaseEntity {
     private List<MemberAgree> memberAgreeList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberPrefer> memberPreferList = new ArrayList<>();
 
     @Builder.Default
