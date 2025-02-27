@@ -6,6 +6,9 @@ import umc.spring.domain.FoodCategory;
 import umc.spring.domain.Member;
 import umc.spring.domain.common.BaseEntity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -25,6 +28,8 @@ public class MemberPrefer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private FoodCategory foodCategory;
+
+    private LocalDateTime createdAt;
 
     public void setMember(Member member){
         if(this.member != null)
