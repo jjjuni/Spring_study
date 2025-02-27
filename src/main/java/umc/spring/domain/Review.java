@@ -29,8 +29,6 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private Float score;
 
-    private LocalDateTime createdAt;
-
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

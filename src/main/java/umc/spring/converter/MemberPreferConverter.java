@@ -15,7 +15,6 @@ public class MemberPreferConverter {
                 .map(foodCategory ->
                         MemberPrefer.builder()
                                 .foodCategory(foodCategory)
-                                .createdAt(LocalDateTime.now())
                                 .build()
                 ).collect(Collectors.toList());
     }

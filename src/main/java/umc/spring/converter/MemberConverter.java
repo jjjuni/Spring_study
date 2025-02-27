@@ -31,7 +31,6 @@ public class MemberConverter {
                 .specAddress(request.getSpecAddress())
                 .gender(gender)
                 .name(request.getName())
-                .createdAt(LocalDateTime.now())
                 .memberPreferList(new ArrayList<>())
                 .build();
     }

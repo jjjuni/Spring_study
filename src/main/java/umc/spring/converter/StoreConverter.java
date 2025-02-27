@@ -20,7 +20,6 @@ public class StoreConverter {
         return Store.builder()
                 .name(request.getName())
                 .address(request.getAddress())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

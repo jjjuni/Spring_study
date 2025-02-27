@@ -29,8 +29,6 @@ public class MemberPrefer extends BaseEntity {
     @JoinColumn(name = "category_id")
     private FoodCategory foodCategory;
 
-    private LocalDateTime createdAt;
-
     public void setMember(Member member){
         if(this.member != null)
             member.getMemberPreferList().remove(this);

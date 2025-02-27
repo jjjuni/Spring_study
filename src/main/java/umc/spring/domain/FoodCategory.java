@@ -25,8 +25,6 @@ public class FoodCategory extends BaseEntity {
     @NotNull(message = "name은 필수입니다.")
     private String name;
 
-    private LocalDateTime createdAt;
-
     @Builder.Default
     @OneToMany(mappedBy = "foodCategory", cascade = CascadeType.ALL)
     private List<MemberPrefer> memberPreferList = new ArrayList<>();

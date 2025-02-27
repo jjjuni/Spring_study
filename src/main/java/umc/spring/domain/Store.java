@@ -33,8 +33,6 @@ public class Store extends BaseEntity {
     @ColumnDefault("0")
     private Float score;
 
-    private LocalDateTime createdAt;
-
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")

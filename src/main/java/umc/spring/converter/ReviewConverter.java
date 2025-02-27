@@ -20,7 +20,6 @@ public class ReviewConverter {
         return Review.builder()
                 .title(request.getTitle())
                 .score(request.getScore())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 }
