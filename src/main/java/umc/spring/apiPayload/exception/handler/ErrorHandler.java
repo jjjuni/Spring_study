@@ -3,9 +3,9 @@ package umc.spring.apiPayload.exception.handler;
 import umc.spring.apiPayload.code.BaseErrorCode;
 import umc.spring.apiPayload.exception.GeneralException;
 
-public class FoodCategoryHandler extends GeneralException {
+public class ErrorHandler extends GeneralException {
 
-    public FoodCategoryHandler(BaseErrorCode errorCode){
+    public ErrorHandler(BaseErrorCode errorCode){
         super(errorCode);
     }
 }
