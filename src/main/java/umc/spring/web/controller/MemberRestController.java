@@ -17,12 +17,12 @@ import umc.spring.web.dto.MemberDTO.MemberResponseDTO;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/members")
+@RequestMapping("/member")
 public class MemberRestController {
 
     private final MemberCommandService memberCommandService;
 
-    @PostMapping("/")
+    @PostMapping("/register")
     public ApiResponse<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDTO request){
         Member member = memberCommandService.joinMember(request);
         return ApiResponse.onSuccess(MemberConverter.toJoinResultDTO(member));

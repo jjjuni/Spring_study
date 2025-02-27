@@ -8,8 +8,8 @@ import umc.spring.apiPayload.exception.handler.ErrorHandler;
 import umc.spring.converter.StoreConverter;
 import umc.spring.domain.Region;
 import umc.spring.domain.Store;
-import umc.spring.repository.RegionRepository;
-import umc.spring.repository.StoreRepository;
+import umc.spring.repository.RegionRepository.RegionRepository;
+import umc.spring.repository.StoreRepository.StoreRepository;
 import umc.spring.web.dto.StoreDTO.StoreRequestDTO;
 
 @Service
