@@ -24,7 +24,7 @@ public class Review extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String comment;
 
     @Column(nullable = false)
     private Float score;
