@@ -45,4 +45,29 @@ public class StoreResponseDTO {
         String comment;
         LocalDate createdAt;
     }
+
+    // 미션 목록 조회 응답 DTO
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MissionPreviewListDTO{
+        List<MissionPreviewDTO> missionList;
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MissionPreviewDTO {
+        Long missionId;
+        Integer reward;
+        String missionSpec;
+        LocalDate deadline;
+    }
 }
