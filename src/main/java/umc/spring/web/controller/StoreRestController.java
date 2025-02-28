@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import umc.spring.apiPayload.ApiResponse;
 import umc.spring.converter.StoreConverter;
+import umc.spring.domain.Mission;
 import umc.spring.domain.Review;
 import umc.spring.domain.Store;
 import umc.spring.service.StoreService.StoreCommandService;
@@ -29,6 +30,7 @@ import umc.spring.web.dto.StoreDTO.StoreResponseDTO;
 @RequestMapping("/store")
 public class StoreRestController {
 
+    // PostMapping
     private final StoreCommandService storeCommandService;
 
     // 추후에 path 및 body 수정 필요
@@ -39,7 +41,7 @@ public class StoreRestController {
     }
 
 
-
+    // GetMapping
     private final StoreQueryService storeQueryService;
 
     @GetMapping("/{storeId}/reviews")
@@ -51,10 +53,22 @@ public class StoreRestController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 이상", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
     @Parameters({
-            @Parameter(name = "storeId", description = "가게 아이디, path variable")
+            @Parameter(name = "storeId", description = "가게 아이디 : path variable", example = "1"),
+            @Parameter(name = "page", description = "페이지 : request param", example = "1")
     })
     public ApiResponse<StoreResponseDTO.ReviewPreviewListDTO> getReviewList(@ExistStore @PathVariable(name = "storeId") Long storeId, @CheckPage @RequestParam(name = "page") Integer page){
         Page<Review> reviewList = storeQueryService.getReviewList(storeId, page - 1);
         return ApiResponse.onSuccess(StoreConverter.reviewPreviewListDTO(reviewList));
+    }
+
+    @GetMapping("/{storeId}/missions")
+    @Operation(summary = "특정 가게의 미션 목록 조회 API", description = "특정 가게의 미션 목록을 조회하는 API로 페이징을 포함. query String으로 page 번호 핑료")
+    @Parameters({
+            @Parameter(name = "storeId", description = "가게 아이디 : path variable", example = "1"),
+            @Parameter(name = "page", description = "페이지 : request param", example = "1")
+    })
+    public ApiResponse<StoreResponseDTO.MissionPreviewListDTO> getMissionList(@ExistStore @PathVariable(name = "storeId") Long storeId, @CheckPage @RequestParam(name = "page") Integer page){
+        Page<Mission> missionList = storeQueryService.getMissionList(storeId, page - 1);
+        return ApiResponse.onSuccess(StoreConverter.missionPreviewListDTO(missionList));
     }
 }

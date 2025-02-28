@@ -5,13 +5,11 @@ package umc.spring.init;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import umc.spring.domain.FoodCategory;
-import umc.spring.domain.Member;
-import umc.spring.domain.Region;
-import umc.spring.domain.Store;
+import umc.spring.domain.*;
 import umc.spring.domain.mapping.MemberPrefer;
 import umc.spring.repository.FoodCategoryRepository.FoodCategoryRepository;
 import umc.spring.repository.MemberRepository.MemberRepository;
+import umc.spring.repository.MissionRepository.MissionRepository;
 import umc.spring.repository.RegionRepository.RegionRepository;
 import umc.spring.repository.StoreRepository.StoreRepository;
 
@@ -26,6 +24,8 @@ public class DataLoader implements CommandLineRunner {
     public final RegionRepository regionRepository;
 
     public final StoreRepository storeRepository;
+
+    public final MissionRepository missionRepository;
 
     public final FoodCategoryRepository foodCategoryRepository;
 
@@ -65,6 +65,32 @@ public class DataLoader implements CommandLineRunner {
                     .build();
 
             storeRepository.saveAll(Arrays.asList(store1, store2));
+
+            Mission mission1 = Mission.builder()
+                    .store(store1)
+                    .reward(500)
+                    .missionSpec("12000원 사용하기")
+                    .build();
+
+            Mission mission2 = Mission.builder()
+                    .store(store1)
+                    .reward(600)
+                    .missionSpec("15000원 사용하기")
+                    .build();
+
+            Mission mission3 = Mission.builder()
+                    .store(store1)
+                    .reward(800)
+                    .missionSpec("20000원 사용하기")
+                    .build();
+
+            Mission mission4 = Mission.builder()
+                    .store(store2)
+                    .reward(500)
+                    .missionSpec("10000원 사용하기")
+                    .build();
+
+            missionRepository.saveAll(Arrays.asList(mission1, mission2, mission3, mission4));
         }
 
         if (foodCategoryRepository.count() == 0) {
