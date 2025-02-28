@@ -18,7 +18,7 @@ public class ReviewConverter {
     public static Review toReview(ReviewRequestDTO.AddReviewDTO request){
 
         return Review.builder()
-                .title(request.getTitle())
+                .comment(request.getComment())
                 .score(request.getScore())
                 .build();
     }
