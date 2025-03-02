@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import umc.spring.domain.Member;
-import umc.spring.repository.MemberRepository.MemberRepository;
+import umc.spring.domain.Member.data.Member;
+import umc.spring.domain.Member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor

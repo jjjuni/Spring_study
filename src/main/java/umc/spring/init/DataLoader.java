@@ -5,17 +5,19 @@ package umc.spring.init;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import umc.spring.domain.*;
-import umc.spring.domain.mapping.MemberPrefer;
-import umc.spring.repository.FoodCategoryRepository.FoodCategoryRepository;
-import umc.spring.repository.MemberRepository.MemberRepository;
-import umc.spring.repository.MissionRepository.MissionRepository;
-import umc.spring.repository.RegionRepository.RegionRepository;
-import umc.spring.repository.StoreRepository.StoreRepository;
+import umc.spring.domain.FoodCategory.data.FoodCategory;
+import umc.spring.domain.Member.data.Member;
+import umc.spring.domain.Mission.data.Mission;
+import umc.spring.domain.Region.data.Region;
+import umc.spring.domain.Store.data.Store;
+import umc.spring.domain.Member.data.mapping.MemberPrefer;
+import umc.spring.domain.FoodCategory.repository.FoodCategoryRepository;
+import umc.spring.domain.Member.repository.MemberRepository;
+import umc.spring.domain.Mission.repository.MissionRepository;
+import umc.spring.domain.Region.repository.RegionRepository;
+import umc.spring.domain.Store.repository.StoreRepository;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 @Component
 @AllArgsConstructor
