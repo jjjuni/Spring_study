@@ -1,6 +1,6 @@
 package umc.spring.domain.Mission.converter;
 
-import umc.spring.domain.Mission.data.Mission.data.enums.MissionStatus;
+import umc.spring.domain.Mission.data.enums.MissionStatus;
 import umc.spring.domain.Mission.data.mapping.MemberMission;
 import umc.spring.domain.Mission.web.dto.MissionRequestDTO;
 import umc.spring.domain.Mission.web.dto.MissionResponseDTO;

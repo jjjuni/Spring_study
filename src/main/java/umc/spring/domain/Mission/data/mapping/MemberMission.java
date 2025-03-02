@@ -5,7 +5,7 @@ import lombok.*;
 import umc.spring.domain.Member.data.Member;
 import umc.spring.domain.Mission.data.Mission;
 import umc.spring.global.data.BaseEntity;
-import umc.spring.domain.Mission.data.Mission.data.enums.MissionStatus;
+import umc.spring.domain.Mission.data.enums.MissionStatus;
 
 @Entity
 @Getter
