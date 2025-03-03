@@ -7,20 +7,31 @@ spring:
   sql:
     init:
       mode: never
-
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        show_sql: true
+        show_sql: false # sql 로그 찍기
         format_sql: true
         use_sql_comments: true
         hbm2ddl:
-          auto: update
+          auto: create
         default_batch_fetch_size: 1000
-
   security:
+    permitted-uris:
+      - "/login"
+      - "/api/auth/**"
+      - "/oauth2/**"
+      - "/swagger-ui/**"
+      - "/v3/api-docs/**"
+      - "/swagger-ui.html"
+      - "/swagger-resources/**"
     oauth2:
+      url:
+        base: "http://localhost:3000"
+        path:
+          signup: "/signup"
+          auth: "/auth"
       client:
         registration:
           kakao:
@@ -29,7 +40,7 @@ spring:
             client-secret: ${KAKAO_CLIENT_SECRET}
             redirect-uri: ${KAKAO_DOMAIN}
             authorization-grant-type: authorization_code
-            scope: profile_nickname
+            scope: profile_nickname, account_email
             client-name: Kakao
         provider:
           kakao:
@@ -37,3 +48,8 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+  jwt:
+    access-secret: ${JWT_ACCESS_SECRET}
+    refresh-secret: ${JWT_REFRESH_SECRET}
+    access-expiration: 600000  # 10 min: 10min * 60 sec * 1000 millisecond
+    refresh-expiration: 10800000  # 10800000 3 hours: 3hours * 60min * 60sec * 1000 millisecond
