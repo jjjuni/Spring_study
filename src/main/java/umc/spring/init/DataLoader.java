@@ -5,17 +5,17 @@ package umc.spring.init;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import umc.spring.domain.FoodCategory.data.FoodCategory;
-import umc.spring.domain.Member.data.Member;
-import umc.spring.domain.Mission.data.Mission;
-import umc.spring.domain.Region.data.Region;
-import umc.spring.domain.Store.data.Store;
-import umc.spring.domain.Member.data.mapping.MemberPrefer;
-import umc.spring.domain.FoodCategory.repository.FoodCategoryRepository;
-import umc.spring.domain.Member.repository.MemberRepository;
-import umc.spring.domain.Mission.repository.MissionRepository;
-import umc.spring.domain.Region.repository.RegionRepository;
-import umc.spring.domain.Store.repository.StoreRepository;
+import umc.spring.domain.foodcategory.data.FoodCategory;
+import umc.spring.domain.user.data.User;
+import umc.spring.domain.mission.data.Mission;
+import umc.spring.domain.region.data.Region;
+import umc.spring.domain.store.data.Store;
+import umc.spring.domain.user.data.mapping.UserPrefer;
+import umc.spring.domain.foodcategory.repository.FoodCategoryRepository;
+import umc.spring.domain.user.repository.UserRepository;
+import umc.spring.domain.mission.repository.MissionRepository;
+import umc.spring.domain.region.repository.RegionRepository;
+import umc.spring.domain.store.repository.StoreRepository;
 
 import java.util.Arrays;
 
@@ -31,7 +31,7 @@ public class DataLoader implements CommandLineRunner {
 
     public final FoodCategoryRepository foodCategoryRepository;
 
-    public final MemberRepository memberRepository;
+    public final UserRepository userRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -114,32 +114,36 @@ public class DataLoader implements CommandLineRunner {
 
             foodCategoryRepository.saveAll(Arrays.asList(food1, food2, food3, food4));
 
-            Member member1 = Member.builder()
+            User user1 = User.builder()
                     .name("이름1")
                     .address("주소1")
                     .specAddress("상세주소1")
+                    .email("aaa@asd.com")
+                    .password("aaa")
                     .build();
 
-            Member member2 = Member.builder()
+            User user2 = User.builder()
                     .name("이름2")
                     .address("주소2")
                     .specAddress("상세주소2")
+                    .email("bbb@asd.com")
+                    .password("bbb")
                     .build();
 
-            MemberPrefer prefer1 = MemberPrefer.builder()
+            UserPrefer prefer1 = UserPrefer.builder()
                     .foodCategory(food1)
-                    .member(member1)
+                    .user(user1)
                     .build();
 
-            MemberPrefer prefer2 = MemberPrefer.builder()
+            UserPrefer prefer2 = UserPrefer.builder()
                     .foodCategory(food1)
-                    .member(member2)
+                    .user(user2)
                     .build();
 
-            member1.getMemberPreferList().add(prefer1);
-            member1.getMemberPreferList().add(prefer2);
+            user1.getUserPreferList().add(prefer1);
+            user1.getUserPreferList().add(prefer2);
 
-            memberRepository.saveAll(Arrays.asList(member1, member2));
+            userRepository.saveAll(Arrays.asList(user1, user2));
         }
     }
 }

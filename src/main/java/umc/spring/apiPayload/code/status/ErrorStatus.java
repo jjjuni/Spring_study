@@ -21,9 +21,13 @@ public enum ErrorStatus implements BaseErrorCode {
     // Page
     NOT_PAGE(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 요청이 잘못되었습니다. (page = 1 이상의 int)"),
 
-    // Member
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다,"),
-    NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "닉네임은 필수입니다."),
+    // User
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "존재하지 않는 사용자입니다,"),
+    NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "USER4002", "닉네임은 필수입니다."),
+    NOT_AUTHENTICATED(HttpStatus.BAD_REQUEST, "USER4003", "인증되지 않은 사용자입니다."),
+    // Token
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN4001", "유효하지 않은 토큰입니다."),
+    JWT_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "TOKEN4002", "토큰을 찾을 수 없습니다."),
 
     // FoodCategory
     FOOD_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_CATEGORY4001", "음식 카테고리를 찾을 수 없습니다."),

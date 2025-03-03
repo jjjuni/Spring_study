@@ -1,50 +1,71 @@
 package umc.spring.config.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import umc.spring.config.security.OAuth2.CustomOAuth2UserService;
+import umc.spring.config.security.OAuth2.handler.OAuth2FailureHandler;
+import umc.spring.config.security.OAuth2.handler.OAuth2SuccessHandler;
+import umc.spring.domain.token.filter.JwtAuthenticationFilter;
+import umc.spring.domain.token.service.JwtService;
+import umc.spring.domain.user.repository.UserRepository;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    public static final String[] PERMITTED_URI = {"/auth/**", "/oauth2/**", "/api/auth/**", "/login", "/logout", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
+    private static final String[] PERMITTED_ROLES = {"USER", "ADMIN"};
+
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .httpBasic(HttpBasicConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable) // csrf 보호 비활성화
+                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/home", "/signup", "/members/signup", "/css/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().permitAll()
+                        // 스웨거는 권한 없이 접근 가능하도록 설정
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**").permitAll()
+                        // 특정 권한이 있어야만 특정 API에 접근할 수 있도록 설정
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // 특정 API들은 별도의 인증/인가 과정 없이도 접근이 가능하도록 설정
+                        .requestMatchers(PERMITTED_URI).permitAll()
+                        // 그 외의 요청들은 PERMITTED_ROLES 중 하나라도 가지고 있어야 접근이 가능하도록 설정
+                        .anyRequest().permitAll())
+
+                // JWT 사용으로 인한 세션 미사용
+                .sessionManagement(configure -> configure
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
+
+                .oauth2Login(customConfigure -> customConfigure
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
+                        .userInfoEndpoint(endpointConfig -> endpointConfig.userService(customOAuth2UserService))
                 )
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .permitAll()
-                )
-                .logout((logout) -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .permitAll()
+
+                .logout(logout -> logout
+                        .logoutUrl("/spring-security-logout")       // 시큐리티 기본 로그아웃 url 변경
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "Authorization")
                 );
 
         return http.build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 }

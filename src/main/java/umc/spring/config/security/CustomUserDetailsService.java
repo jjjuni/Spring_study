@@ -5,24 +5,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import umc.spring.domain.Member.data.Member;
-import umc.spring.domain.Member.repository.MemberRepository;
+import umc.spring.apiPayload.code.status.ErrorStatus;
+import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.domain.token.UserPrincipal;
+import umc.spring.domain.user.data.User;
+import umc.spring.domain.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final MemberRepository memberRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일을 가진 유저가 존재하지 않습니다. " + username));
+    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(member.getEmail())
-                .password(member.getPassword())
-                .roles(member.getRole().name())
-                .build();
+        return new UserPrincipal(user);
     }
 }
