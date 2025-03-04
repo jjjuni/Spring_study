@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import umc.spring.config.security.OAuth2.CustomOAuth2UserService;
 import umc.spring.config.security.OAuth2.handler.OAuth2FailureHandler;
 import umc.spring.config.security.OAuth2.handler.OAuth2SuccessHandler;
@@ -17,13 +20,14 @@ import umc.spring.domain.token.filter.JwtAuthenticationFilter;
 import umc.spring.domain.token.service.JwtService;
 import umc.spring.domain.user.repository.UserRepository;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     public static final String[] PERMITTED_URI = {"/auth/**", "/oauth2/**", "/api/auth/**", "/login", "/logout", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
-    private static final String[] PERMITTED_ROLES = {"USER", "ADMIN"};
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -31,12 +35,30 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:8080"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))  // CORS 설정 추가
+                .csrf(AbstractHttpConfigurer::disable)  // csrf 보호 비활성화
                 .httpBasic(HttpBasicConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable) // csrf 보호 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                         // 스웨거는 권한 없이 접근 가능하도록 설정
@@ -51,8 +73,6 @@ public class SecurityConfig {
                 // JWT 사용으로 인한 세션 미사용
                 .sessionManagement(configure -> configure
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
 
                 .oauth2Login(customConfigure -> customConfigure
                         .successHandler(oAuth2SuccessHandler)

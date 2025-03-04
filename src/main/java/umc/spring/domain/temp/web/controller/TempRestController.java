@@ -1,10 +1,7 @@
 package umc.spring.domain.temp.web.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import umc.spring.apiPayload.ApiResponse;
 import umc.spring.domain.temp.converter.TempConverter;
 import umc.spring.domain.temp.service.TempQueryService;
@@ -17,8 +14,13 @@ public class TempRestController {
 
     private final TempQueryService tempQueryService;
 
+    @PostMapping("/test")
+    public ApiResponse<TempResponse.TempTestDTO> testPostAPI() {
+        return ApiResponse.onSuccess(TempConverter.toTempTestDTO());
+    }
+
     @GetMapping("/test")
-    public ApiResponse<TempResponse.TempTestDTO> testAPI() {
+    public ApiResponse<TempResponse.TempTestDTO> testGetAPI() {
         return ApiResponse.onSuccess(TempConverter.toTempTestDTO());
     }
 

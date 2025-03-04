@@ -29,7 +29,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException{
+                                        Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -43,7 +43,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         jwtService.generateRefreshToken(response, user);
         jwtService.generateAccessToken(response, user);
 
-        String redirectUrl = getRedirectUrlByRole(user.getRole());
+//        String redirectUrl = getRedirectUrlByRole(user.getRole());
+
+        String redirectUrl = "http://localhost:3000";
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
