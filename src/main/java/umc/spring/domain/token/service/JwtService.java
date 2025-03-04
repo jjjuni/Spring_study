@@ -1,7 +1,6 @@
 package umc.spring.domain.token.service;
 
 import io.jsonwebtoken.Jwts;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,16 +14,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.config.security.CustomUserDetailsService;
-import umc.spring.domain.auth.web.dto.AuthResponseDTO;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.data.enums.Role;
 import umc.spring.domain.token.JwtGenerator;
 import umc.spring.domain.token.JwtUtil;
 import umc.spring.domain.token.data.RefreshToken;
 import umc.spring.domain.token.data.enums.JwtRule;
-import umc.spring.domain.token.data.enums.TokenStatus;
 import umc.spring.domain.token.repository.RefreshTokenRepository;
 import umc.spring.domain.user.repository.UserRepository;
 
@@ -49,7 +46,7 @@ public class JwtService {
 
     public void validateUser(User request) {
         if(request.getRole() == Role.NOT_REGISTERED) {
-            throw new ErrorHandler(ErrorStatus.NOT_AUTHENTICATED);
+            throw new ErrorException(ErrorStatus.NOT_AUTHENTICATED);
         }
     }
 
@@ -89,14 +86,14 @@ public class JwtService {
     }
 
     public boolean validateAccessToken(String token){
-        return jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS)) == TokenStatus.AUTHENTICATED;
+        return jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS));
     }
 
     public boolean validateRefreshToken(String token, Long userId){
-        boolean isRefreshValid = jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH)) == TokenStatus.AUTHENTICATED;
+        boolean isRefreshValid = jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH));
 
         RefreshToken storedToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.INVALID_TOKEN));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.INVALID_TOKEN));
 
         boolean isTokenMatched = Objects.equals(storedToken.getToken(), token);
 
@@ -132,7 +129,7 @@ public class JwtService {
         String email = getUserEmail(accessToken, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS));
 
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
     }
 
     public void logout(User request, HttpServletResponse response) {

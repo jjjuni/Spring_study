@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.config.security.OAuth2.UserPrincipal;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.repository.UserRepository;
@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
 
         return new UserPrincipal(user);
     }

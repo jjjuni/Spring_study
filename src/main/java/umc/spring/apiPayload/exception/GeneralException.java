@@ -9,7 +9,7 @@ import umc.spring.apiPayload.code.ErrorReasonDTO;
 @AllArgsConstructor
 public class GeneralException extends RuntimeException {
 
-    private BaseErrorCode code;
+    private final BaseErrorCode code;
 
     public ErrorReasonDTO getErrorReason() {
         return this.code.getReason();
@@ -17,5 +17,9 @@ public class GeneralException extends RuntimeException {
 
     public ErrorReasonDTO getErrorReasonHttpStatus() {
         return this.code.getReasonHttpStatus();
+    }
+
+    public String getMessage() {
+        return this.code.getMessage();
     }
 }

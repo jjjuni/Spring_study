@@ -1,6 +1,5 @@
 package umc.spring.config.security.OAuth2.handler;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.domain.token.service.JwtService;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.data.enums.Role;
@@ -38,7 +37,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = (String) kakaoAccount.get("email");
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
 
         jwtService.generateRefreshToken(response, user);
         jwtService.generateAccessToken(response, user);

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import umc.spring.apiPayload.ApiResponse;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.domain.auth.converter.AuthConverter;
 import umc.spring.domain.auth.web.dto.AuthRequestDTO;
 import umc.spring.domain.auth.web.dto.AuthResponseDTO;
@@ -34,7 +34,7 @@ public class AuthController {
     @PostMapping("/register")
     public ApiResponse<AuthResponseDTO.AuthResultDTO> generateToken(HttpServletResponse response, @RequestBody AuthRequestDTO.AuthDTO request){
         User requestUser = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
         jwtService.validateUser(requestUser);
 
         jwtService.generateAccessToken(response, requestUser);

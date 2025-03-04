@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.domain.user.converter.UserConverter;
 import umc.spring.domain.user.converter.UserPreferConverter;
 import umc.spring.domain.foodcategory.data.FoodCategory;
@@ -39,7 +39,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         newUser.encodePassword(passwordEncoder.encode(request.getPassword()));
 
         List<FoodCategory> foodCategoryList = request.getPreferCategory().stream()
-                .map(category -> foodCategoryRepository.findById(category).orElseThrow(() -> new ErrorHandler(ErrorStatus.FOOD_CATEGORY_NOT_FOUND)))
+                .map(category -> foodCategoryRepository.findById(category).orElseThrow(() -> new ErrorException(ErrorStatus.FOOD_CATEGORY_NOT_FOUND)))
                 .collect(Collectors.toList());
 
         List<UserPrefer> userPreferList = UserPreferConverter.toUserPreferList(foodCategoryList);

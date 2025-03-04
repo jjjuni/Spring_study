@@ -1,5 +1,6 @@
-package umc.spring.domain.token.filter;
+package umc.spring.config.security.OAuth2.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
+import umc.spring.apiPayload.exception.GeneralException;
 import umc.spring.domain.token.JwtUtil;
 import umc.spring.domain.token.data.enums.JwtRule;
 import umc.spring.domain.user.data.User;
@@ -19,16 +21,12 @@ import umc.spring.domain.user.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static umc.spring.config.security.SecurityConfig.PERMITTED_URI;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-//    @Value("${spring.security.permitted-uris}")
-//    private String[] PERMITTED_URI;
 
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
@@ -48,28 +46,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
         String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
 
-        if (Objects.equals(accessToken, "") && Objects.equals(refreshToken, "")) {
-            System.out.println("null");
-            throw new ErrorHandler(ErrorStatus.JWT_TOKEN_NOT_FOUND);
-        }
+        try{
+            if (jwtService.validateAccessToken(accessToken)){
+                System.out.println(request.getRequestURI() + " : 유저 정보 확인");
+                setAuthenticationToContext(accessToken);
+                filterChain.doFilter(request, response);
+                return;
+            }
+        } catch (ExpiredJwtException e) {
+            // 엑세스 토큰이 만료된 경우 재발급 진행
 
-        if (jwtService.validateAccessToken(accessToken)){
-            System.out.println(request.getRequestURI() + " : 유저 정보 확인");
-            setAuthenticationToContext(accessToken);
-            filterChain.doFilter(request, response);
-            return;
-        }
+            User user = findUserByRefreshToken(refreshToken);
 
-        // 리프레시 없을 때 에러 처리 필요
-        
-        User user = findUserByRefreshToken(refreshToken);
+            if (user != null && jwtService.validateRefreshToken(refreshToken, user.getId())) {
+                String reissuedAccessToken = jwtService.generateAccessToken(response, user);
+                jwtService.generateRefreshToken(response, user);
 
-        if (user != null && jwtService.validateRefreshToken(refreshToken, user.getId())) {
-            String reissuedAccessToken = jwtService.generateAccessToken(response, user);
-            jwtService.generateRefreshToken(response, user);
+                setAuthenticationToContext(reissuedAccessToken);
+                filterChain.doFilter(request, response);
+            }
 
-            setAuthenticationToContext(reissuedAccessToken);
-            filterChain.doFilter(request, response);
+        } catch (GeneralException e) {
+            System.out.println("필터에서 에러남");
+            System.out.println("e.getCode() = " + e.getCode());
+            System.out.println("e.getMessage() = " + e.getMessage());
+            throw new ErrorException(ErrorStatus.JWT_TOKEN_NOT_FOUND);
         }
     }
 
@@ -84,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private User findUserByRefreshToken(String refreshToken) {
         String identifier = jwtService.getUserEmail(refreshToken, jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH));
-        return userRepository.findByEmail(identifier).orElseThrow(() -> new ErrorHandler(ErrorStatus.JWT_TOKEN_NOT_FOUND));
+        return userRepository.findByEmail(identifier).orElseThrow(() -> new ErrorException(ErrorStatus.JWT_TOKEN_NOT_FOUND));
     }
 
     private void setAuthenticationToContext(String accessToken) {

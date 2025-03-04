@@ -46,6 +46,11 @@ public enum ErrorStatus implements BaseErrorCode {
     private final String message;
 
     @Override
+    public String getMessage() {
+        return this.message;
+    }
+
+    @Override
     public ErrorReasonDTO getReason() {
         return ErrorReasonDTO.builder()
                 .message(message)
