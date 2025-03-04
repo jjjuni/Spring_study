@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import umc.spring.domain.token.UserPrincipal;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.data.enums.Gender;
 import umc.spring.domain.user.data.enums.Role;

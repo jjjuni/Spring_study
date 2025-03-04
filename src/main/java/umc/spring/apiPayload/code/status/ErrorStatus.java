@@ -27,7 +27,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_AUTHENTICATED(HttpStatus.BAD_REQUEST, "USER4003", "인증되지 않은 사용자입니다."),
     // Token
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN4001", "유효하지 않은 토큰입니다."),
-    JWT_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "TOKEN4002", "토큰을 찾을 수 없습니다."),
+    JWT_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TOKEN4002", "토큰을 찾을 수 없습니다."),
 
     // FoodCategory
     FOOD_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_CATEGORY4001", "음식 카테고리를 찾을 수 없습니다."),
@@ -63,10 +63,4 @@ public enum ErrorStatus implements BaseErrorCode {
                 .httpStatus(httpStatus)
                 .build();
     }
-
-
-
-
-
-
 }

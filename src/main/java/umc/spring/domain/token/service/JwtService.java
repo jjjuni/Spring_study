@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.spring.apiPayload.code.status.ErrorStatus;
 import umc.spring.apiPayload.exception.handler.ErrorHandler;
 import umc.spring.config.security.CustomUserDetailsService;
+import umc.spring.domain.auth.web.dto.AuthResponseDTO;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.data.enums.Role;
 import umc.spring.domain.token.JwtGenerator;
@@ -25,6 +26,7 @@ import umc.spring.domain.token.data.RefreshToken;
 import umc.spring.domain.token.data.enums.JwtRule;
 import umc.spring.domain.token.data.enums.TokenStatus;
 import umc.spring.domain.token.repository.RefreshTokenRepository;
+import umc.spring.domain.user.repository.UserRepository;
 
 import java.security.Key;
 import java.util.Objects;
@@ -37,27 +39,13 @@ public class JwtService {
     private final JwtGenerator jwtGenerator;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
-
-    @Value("${spring.jwt.access-secret}")
-    private String ACCESS_SECRET;
-
-    @Value("${spring.jwt.refresh-secret}")
-    private String REFRESH_SECRET;
+    private final UserRepository userRepository;
 
     @Value("${spring.jwt.access-expiration}")
     private long ACCESS_EXPIRATION;
 
     @Value("${spring.jwt.refresh-expiration}")
     private long REFRESH_EXPIRATION;
-
-    private Key accessSecret;
-    private Key refreshSecret;
-
-    @PostConstruct
-    public void init() {
-        this.accessSecret = jwtUtil.getSigningKey(ACCESS_SECRET);
-        this.refreshSecret = jwtUtil.getSigningKey(REFRESH_SECRET);
-    }
 
     public void validateUser(User request) {
         if(request.getRole() == Role.NOT_REGISTERED) {
@@ -66,7 +54,7 @@ public class JwtService {
     }
 
     public String generateAccessToken(HttpServletResponse response, User request){
-        String accessToken = jwtGenerator.generateAccessToken(accessSecret, ACCESS_EXPIRATION, request);
+        String accessToken = jwtGenerator.generateAccessToken(request);
         ResponseCookie cookie = setTokenToCookie(JwtRule.ACCESS_PREFIX.getValue(), accessToken, ACCESS_EXPIRATION / 1000);
         response.addHeader(JwtRule.JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
@@ -75,7 +63,7 @@ public class JwtService {
 
     @Transactional
     public void generateRefreshToken(HttpServletResponse response, User request){
-        String refreshToken = jwtGenerator.generateRefreshToken(refreshSecret, REFRESH_EXPIRATION, request);
+        String refreshToken = jwtGenerator.generateRefreshToken(request);
         ResponseCookie cookie = setTokenToCookie(JwtRule.REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
         response.addHeader(JwtRule.JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
@@ -101,11 +89,11 @@ public class JwtService {
     }
 
     public boolean validateAccessToken(String token){
-        return jwtUtil.getTokenStatus(token, accessSecret) == TokenStatus.AUTHENTICATED;
+        return jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS)) == TokenStatus.AUTHENTICATED;
     }
 
     public boolean validateRefreshToken(String token, Long userId){
-        boolean isRefreshValid = jwtUtil.getTokenStatus(token, refreshSecret) == TokenStatus.AUTHENTICATED;
+        boolean isRefreshValid = jwtUtil.getTokenStatus(token, jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH)) == TokenStatus.AUTHENTICATED;
 
         RefreshToken storedToken = refreshTokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new ErrorHandler(ErrorStatus.INVALID_TOKEN));
@@ -124,12 +112,13 @@ public class JwtService {
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserEmail(token, accessSecret));
+        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserEmail(token, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS)));
         return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 
     // 토큰의 subject(유저 email)을 반환
     public String getUserEmail(String token, Key serectKey){
+
         return Jwts.parserBuilder()
                 .setSigningKey(serectKey)
                 .build()
@@ -138,18 +127,12 @@ public class JwtService {
                 .getSubject();
     }
 
-    // refreshToken을 identifier로 하여 유저의 email 반환
-    public String getIdentifierFromRefresh(String refreshToken) {
-        try{
-            return Jwts.parserBuilder()
-                    .setSigningKey(refreshSecret)
-                    .build()
-                    .parseClaimsJws(refreshToken)
-                    .getBody()
-                    .getSubject();
-        } catch (Exception e){
-            return null;
-        }
+    // accessToken을 identifier로 하여 유저 반환
+    public User getUserFromAccess(String accessToken) {
+        String email = getUserEmail(accessToken, jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS));
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
     }
 
     public void logout(User request, HttpServletResponse response) {

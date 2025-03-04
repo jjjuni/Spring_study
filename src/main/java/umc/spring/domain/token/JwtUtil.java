@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.spring.domain.token.data.enums.JwtRule;
@@ -20,6 +21,16 @@ import java.util.Base64;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class JwtUtil {
+
+    public enum tokenType {
+        ACCESS, REFRESH;
+    }
+
+    @Value("${spring.jwt.access-secret}")
+    private String ACCESS_SECRET;
+
+    @Value("${spring.jwt.refresh-secret}")
+    private String REFRESH_SECRET;
 
     public TokenStatus getTokenStatus(String token, Key secretKey) {
         try {
@@ -51,9 +62,12 @@ public class JwtUtil {
                 .orElse("");
     }
 
-    public Key getSigningKey(String secretKey){
-        String encodedKey = encodeToBase64(secretKey);
-        return Keys.hmacShaKeyFor(encodedKey.getBytes(StandardCharsets.UTF_8));
+    public Key getSigningKey(tokenType token){
+        return switch (token) {
+            case ACCESS -> Keys.hmacShaKeyFor(encodeToBase64(ACCESS_SECRET).getBytes(StandardCharsets.UTF_8));
+            case REFRESH -> Keys.hmacShaKeyFor(encodeToBase64(REFRESH_SECRET).getBytes(StandardCharsets.UTF_8));
+            default -> null ;
+        };
     }
 
     public String encodeToBase64(String secretKey){

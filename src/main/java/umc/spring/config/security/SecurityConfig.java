@@ -13,9 +13,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import umc.spring.apiPayload.exception.handler.ErrorHandler;
 import umc.spring.config.security.OAuth2.CustomOAuth2UserService;
 import umc.spring.config.security.OAuth2.handler.OAuth2FailureHandler;
 import umc.spring.config.security.OAuth2.handler.OAuth2SuccessHandler;
+import umc.spring.domain.token.JwtUtil;
 import umc.spring.domain.token.filter.JwtAuthenticationFilter;
 import umc.spring.domain.token.service.JwtService;
 import umc.spring.domain.user.repository.UserRepository;
@@ -27,9 +29,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    public static final String[] PERMITTED_URI = {"/auth/**", "/oauth2/**", "/api/auth/**", "/login", "/logout", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
+//    @Value("${spring.security.permitted-uris}")
+//    private String[] PERMITTED_URI;
+
+    public static final String[] PERMITTED_URI = {"/oauth2/**", "/api/auth/**", "/login", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
 
     private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -55,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))  // CORS 설정 추가
                 .csrf(AbstractHttpConfigurer::disable)  // csrf 보호 비활성화
                 .httpBasic(HttpBasicConfigurer::disable)
@@ -67,7 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 특정 API들은 별도의 인증/인가 과정 없이도 접근이 가능하도록 설정
                         .requestMatchers(PERMITTED_URI).permitAll()
-                        // 그 외의 요청들은 PERMITTED_ROLES 중 하나라도 가지고 있어야 접근이 가능하도록 설정
+
                         .anyRequest().permitAll())
 
                 // JWT 사용으로 인한 세션 미사용
