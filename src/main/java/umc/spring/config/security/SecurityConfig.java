@@ -30,8 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    public static final String[] PERMITTED_URI = {"/oauth2/**", "/api/auth/**", "/login", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
-
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -39,6 +37,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final PermittedUriService permittedUriService;
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -61,7 +60,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
 //                필터 사용하여 구현하면 아래와 같이 구현 가능! 컨트롤러에서 인증을 하는 것이 아닌 필터 단에서 모든 인증을 마치고 컨트롤러로 넘겨주는 방식. 단 이 방식을 사용 할 시 exception에 대한 필터가 추가로 필요!!!
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(permittedUriService, jwtService, jwtUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(objectMapper), JwtAuthenticationFilter.class)
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))  // CORS 설정 추가
                 .csrf(AbstractHttpConfigurer::disable)  // csrf 보호 비활성화
@@ -73,7 +72,7 @@ public class SecurityConfig {
                         // 특정 권한이 있어야만 특정 API에 접근할 수 있도록 설정
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // 특정 API들은 별도의 인증/인가 과정 없이도 접근이 가능하도록 설정
-                        .requestMatchers(PERMITTED_URI).permitAll()
+                        .requestMatchers(PermittedUriService.PERMITTED_URI).permitAll()
 
                         .anyRequest().permitAll())
 

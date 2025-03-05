@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import umc.spring.apiPayload.code.status.ErrorStatus;
 import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.apiPayload.exception.GeneralException;
+import umc.spring.config.security.PermittedUriService;
 import umc.spring.domain.token.JwtUtil;
 import umc.spring.domain.token.data.enums.JwtRule;
 import umc.spring.domain.user.data.User;
@@ -20,14 +21,12 @@ import umc.spring.domain.token.service.JwtService;
 import umc.spring.domain.user.repository.UserRepository;
 
 import java.io.IOException;
-import java.util.Arrays;
-
-import static umc.spring.config.security.SecurityConfig.PERMITTED_URI;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final PermittedUriService permittedUriService;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
@@ -36,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 인증이 필요 없는 uri 처리
-        if (isPermittedURI(request.getRequestURI())){
+        if (permittedUriService.isPermittedURI(request.getRequestURI())){
             System.out.println(request.getRequestURI() + " : 허가 필요 없음");
             SecurityContextHolder.getContext().setAuthentication(null);
             filterChain.doFilter(request, response);
@@ -72,15 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("e.getMessage() = " + e.getMessage());
             throw new ErrorException(ErrorStatus.JWT_TOKEN_NOT_FOUND);
         }
-    }
-
-    private boolean isPermittedURI(String requestURI){
-        System.out.println(Arrays.toString(PERMITTED_URI));
-        return Arrays.stream(PERMITTED_URI)
-                .anyMatch(permitted -> {
-                    String replace = permitted.replace("*", "");
-                    return requestURI.contains(replace) || replace.contains(requestURI);
-                });
     }
 
     private User findUserByRefreshToken(String refreshToken) {
