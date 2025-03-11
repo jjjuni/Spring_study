@@ -29,14 +29,14 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     }
 
     private void handleException (HttpServletResponse response, GeneralException e) throws IOException {
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setStatus(e.getErrorReasonHttpStatus().getHttpStatus().value());
         response.setContentType("application/json; charset=UTF-8");
 
         ErrorReasonDTO errorReasonDTO = ErrorReasonDTO.builder()
-                .httpStatus(HttpStatus.BAD_REQUEST)
+                .httpStatus(e.getErrorReasonHttpStatus().getHttpStatus())
                 .isSuccess(false)
-                .code(String.valueOf(e.getCode()))
-                .message(e.getMessage())
+                .code(e.getErrorReason().getCode())
+                .message(e.getErrorReason().getMessage())
                 .build();
 
         response.getWriter().write(mapper.writeValueAsString(errorReasonDTO));

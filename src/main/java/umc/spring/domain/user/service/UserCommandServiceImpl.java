@@ -48,4 +48,8 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         return userRepository.save(newUser);
     }
+
+    public User userInfo(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
+    }
 }

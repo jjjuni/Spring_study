@@ -2,6 +2,12 @@ package umc.spring.config.security.OAuth2;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -9,6 +15,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.data.enums.Gender;
 import umc.spring.domain.user.data.enums.Role;
@@ -23,6 +30,9 @@ import java.util.*;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final OAuth2AuthorizedClientService authorizedClientService;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
     @Transactional
@@ -34,18 +44,36 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
         // 서비스 구분 코드 ex) naver, kakao
-//        String providerCode = userRequest.getClientRegistration().getRegistrationId();
+        String providerCode = userRequest.getClientRegistration().getRegistrationId();
 
         // 소셜 쪽에서 받은 값들을 Map 형태로 받음
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
+        String email = null;
+        String nickname = null;
+        SocialType socialType  = null;
 
-        String nickname = (String) kakaoProfile.get("nickname");
-        String email = (String) kakaoAccount.get("email");
-        
-        User user = saveOrUpdateUser(email, nickname);
+        System.out.println(providerCode);
+        if ("kakao".equals(providerCode)) {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+            Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
+
+            email = (String) kakaoAccount.get("email");
+            nickname = (String) kakaoProfile.get("nickname");
+            socialType = SocialType.KAKAO;
+        } else if ("google".equals(providerCode)) {
+            email = (String) attributes.get("email");
+            nickname = (String) attributes.get("name");
+            socialType = SocialType.GOOGLE;
+        } else if ("naver".equals(providerCode)) {
+            Map<String, Object> naverAccount = (Map<String, Object>) attributes.get("response");
+
+            email = (String) naverAccount.get("email");
+            nickname = (String) naverAccount.get("name");
+            socialType = SocialType.NAVER;
+        }
+
+        User user = saveOrUpdateUser(email, nickname, socialType);
 
         Map<String, Object> modifiedAttributes = new HashMap<>(attributes);
         modifiedAttributes.put("email", email);
@@ -53,7 +81,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
-    private User saveOrUpdateUser(String email, String nickname){
+    private User saveOrUpdateUser(String email, String nickname, SocialType socialType){
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     System.out.println("신규 유저. 회원가입 진행");
@@ -66,7 +94,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             .address("소셜로그인")
                             .specAddress("소셜로그인")
                             .role(Role.USER)
-                            .socialType(SocialType.KAKAO)
+                            .socialType(socialType)
                             .build();
                 });
 

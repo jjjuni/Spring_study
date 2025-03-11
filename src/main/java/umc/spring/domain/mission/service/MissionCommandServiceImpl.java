@@ -40,10 +40,10 @@ public class MissionCommandServiceImpl implements MissionCommandService{
     }
 
     @Override
-    public UserMission challengeMission(MissionRequestDTO.ChallengeMissionDTO request) {
+    public UserMission challengeMission(MissionRequestDTO.ChallengeMissionDTO request, String email) {
 
         UserMission newUserMission = UserMissionConverter.toUserMission(request);
-        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
         Mission mission = missionRepository.findById(request.getMissionId()).orElseThrow(() -> new ErrorException(ErrorStatus.MISSION_NOT_FOUND));
 
         newUserMission.setUser(user);

@@ -24,10 +24,11 @@ public enum ErrorStatus implements BaseErrorCode {
     // User
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "존재하지 않는 사용자입니다,"),
     NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "USER4002", "닉네임은 필수입니다."),
-    NOT_AUTHENTICATED(HttpStatus.BAD_REQUEST, "USER4003", "인증되지 않은 사용자입니다."),
+    NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "USER4003", "인증되지 않은 사용자입니다."),
     // Token
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN4001", "유효하지 않은 토큰입니다."),
-    JWT_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TOKEN4002", "토큰을 찾을 수 없습니다. (인증이 필요한 서비스)"),
+    TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "TOKEN4002", "토큰을 찾을 수 없습니다. (인증이 필요한 서비스)"),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN4003", "accessToken이 만료되었습니다.."),
 
     // FoodCategory
     FOOD_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_CATEGORY4001", "음식 카테고리를 찾을 수 없습니다."),
@@ -44,11 +45,6 @@ public enum ErrorStatus implements BaseErrorCode {
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
-
-    @Override
-    public String getMessage() {
-        return this.message;
-    }
 
     @Override
     public ErrorReasonDTO getReason() {

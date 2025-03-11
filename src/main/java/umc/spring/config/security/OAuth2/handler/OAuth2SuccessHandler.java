@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,12 +30,28 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+
+        OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+        final String provider = token.getAuthorizedClientRegistrationId();
+
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
 
-        String email = (String) kakaoAccount.get("email");
+        String email = "";
+
+        switch (provider) {
+            case "kakao" -> {
+                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+                email = (String) kakaoAccount.get("email");
+            }
+            case "naver" -> {
+                Map<String, Object> naverAccount = (Map<String, Object>) attributes.get("response");
+                email = (String) naverAccount.get("email");
+            }
+            case "google" -> {
+                email = (String) attributes.get("email");
+            }
+        }
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
@@ -42,16 +59,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         jwtService.generateRefreshToken(response, user);
         jwtService.generateAccessToken(response, user);
 
-//        String redirectUrl = getRedirectUrlByRole(user.getRole());
-
         String redirectUrl = "http://localhost:3000";
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
-    }
-
-    private String getRedirectUrlByRole(Role role){
-        if (role == Role.NOT_REGISTERED) {
-            return "/register";
-        }
-        return "/home";
     }
 }

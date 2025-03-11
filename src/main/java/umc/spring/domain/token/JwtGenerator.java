@@ -29,7 +29,7 @@ public class JwtGenerator {
         return Jwts.builder()
                 .setHeader(createHeader())
                 .setClaims(createClaims(user))
-                .setSubject(String.valueOf(user.getEmail()))
+                .setSubject(user.getEmail())
                 .setExpiration(new Date(now + ACCESS_EXPIRATION))
                 .signWith(jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS), SignatureAlgorithm.HS256)
                 .compact();
@@ -40,9 +40,9 @@ public class JwtGenerator {
 
         return Jwts.builder()
                 .setHeader(createHeader())
-                .setSubject(String.valueOf(user.getId()))
+                .setSubject(user.getEmail())
                 .setExpiration(new Date(now + REFRESH_EXPIRATION))
-                .signWith(jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS), SignatureAlgorithm.HS256)
+                .signWith(jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH), SignatureAlgorithm.HS256)
                 .compact();
     }
 

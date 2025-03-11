@@ -114,36 +114,36 @@ public class DataLoader implements CommandLineRunner {
 
             foodCategoryRepository.saveAll(Arrays.asList(food1, food2, food3, food4));
 
-            User user1 = User.builder()
-                    .name("이름1")
-                    .address("주소1")
-                    .specAddress("상세주소1")
-                    .email("aaa@asd.com")
-                    .password("aaa")
-                    .build();
-
-            User user2 = User.builder()
-                    .name("이름2")
-                    .address("주소2")
-                    .specAddress("상세주소2")
-                    .email("bbb@asd.com")
-                    .password("bbb")
-                    .build();
-
-            UserPrefer prefer1 = UserPrefer.builder()
-                    .foodCategory(food1)
-                    .user(user1)
-                    .build();
-
-            UserPrefer prefer2 = UserPrefer.builder()
-                    .foodCategory(food1)
-                    .user(user2)
-                    .build();
-
-            user1.getUserPreferList().add(prefer1);
-            user1.getUserPreferList().add(prefer2);
-
-            userRepository.saveAll(Arrays.asList(user1, user2));
+//            User user1 = User.builder()
+//                    .name("이름1")
+//                    .address("주소1")
+//                    .specAddress("상세주소1")
+//                    .email("aaa@asd.com")
+//                    .password("aaa")
+//                    .build();
+//
+//            User user2 = User.builder()
+//                    .name("이름2")
+//                    .address("주소2")
+//                    .specAddress("상세주소2")
+//                    .email("bbb@asd.com")
+//                    .password("bbb")
+//                    .build();
+//
+//            UserPrefer prefer1 = UserPrefer.builder()
+//                    .foodCategory(food1)
+//                    .user(user1)
+//                    .build();
+//
+//            UserPrefer prefer2 = UserPrefer.builder()
+//                    .foodCategory(food1)
+//                    .user(user2)
+//                    .build();
+//
+//            user1.getUserPreferList().add(prefer1);
+//            user1.getUserPreferList().add(prefer2);
+//
+//            userRepository.saveAll(Arrays.asList(user1, user2));
         }
     }
 }

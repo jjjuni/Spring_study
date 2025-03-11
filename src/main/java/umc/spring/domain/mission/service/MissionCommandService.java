@@ -7,5 +7,5 @@ import umc.spring.domain.mission.web.dto.MissionRequestDTO;
 public interface MissionCommandService {
     public Mission addMission(MissionRequestDTO.AddMissionDTO request);
 
-    public UserMission challengeMission(MissionRequestDTO.ChallengeMissionDTO request);
+    public UserMission challengeMission(MissionRequestDTO.ChallengeMissionDTO request, String email);
 }

@@ -14,7 +14,6 @@ public class PermittedUriService {
 
 
     public boolean isPermittedURI(String requestURI){
-        System.out.println(Arrays.toString(PERMITTED_URI));
         return Arrays.stream(PERMITTED_URI)
                 .anyMatch(permitted -> {
                     String replace = permitted.replace("*", "");
