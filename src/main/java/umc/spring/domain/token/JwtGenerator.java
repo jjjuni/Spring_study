@@ -2,38 +2,47 @@ package umc.spring.domain.token;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import umc.spring.domain.user.data.User;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class JwtGenerator {
 
-    public String generateAccessToken(final Key ACCESS_SECRET, final long ACCESS_EXPIRATION, User user){
+    @Value("${spring.jwt.access-expiration}")
+    private long ACCESS_EXPIRATION;
+
+    @Value("${spring.jwt.refresh-expiration}")
+    private long REFRESH_EXPIRATION;
+
+    private final JwtUtil jwtUtil;
+
+    public String generateAccessToken(User user){
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
                 .setClaims(createClaims(user))
-                .setSubject(String.valueOf(user.getEmail()))
+                .setSubject(user.getEmail())
                 .setExpiration(new Date(now + ACCESS_EXPIRATION))
-                .signWith(ACCESS_SECRET, SignatureAlgorithm.HS256)
+                .signWith(jwtUtil.getSigningKey(JwtUtil.tokenType.ACCESS), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(final Key REFRESH_SECRET, final long REFRESH_EXPIRATION, User user){
+    public String generateRefreshToken(User user){
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
                 .setSubject(user.getEmail())
                 .setExpiration(new Date(now + REFRESH_EXPIRATION))
-                .signWith(REFRESH_SECRET, SignatureAlgorithm.HS256)
+                .signWith(jwtUtil.getSigningKey(JwtUtil.tokenType.REFRESH), SignatureAlgorithm.HS256)
                 .compact();
     }
 

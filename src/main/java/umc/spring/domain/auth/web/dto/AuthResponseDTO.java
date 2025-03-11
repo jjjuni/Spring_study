@@ -16,4 +16,21 @@ public class AuthResponseDTO {
     public static class AuthResultDTO{
         LocalDateTime now;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LogoutResultDTO {
+        LocalDateTime createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserInfoDTO{
+        String email;
+        String name;
+    }
 }

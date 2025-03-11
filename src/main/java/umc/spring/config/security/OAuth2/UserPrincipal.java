@@ -1,4 +1,4 @@
-package umc.spring.domain.token;
+package umc.spring.config.security.OAuth2;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

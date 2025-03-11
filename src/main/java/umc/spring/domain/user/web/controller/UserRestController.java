@@ -36,23 +36,4 @@ public class UserRestController {
         User user = userCommandService.joinUser(request);
         return ApiResponse.onSuccess(UserConverter.toJoinResultDTO(user));
     }
-
-    @PostMapping("/logout")
-    public ApiResponse<UserResponseDTO.LogoutResultDTO> logout(HttpServletRequest request, HttpServletResponse response) {
-
-        String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
-
-        User user = userRepository.findByEmail(jwtService.getIdentifierFromRefresh(refreshToken)).orElse(null);
-
-        try {
-            jwtService.logout(user, response);
-            System.out.println("complete");
-        } catch (Exception e){
-            // 예상하지 못한 타입일 경우 처리
-            System.out.println(e);
-            System.out.println("logout Post 이상");
-        }
-
-        return ApiResponse.onSuccess(UserResponseDTO.LogoutResultDTO.builder().createdAt(LocalDateTime.now()).build());
-    }
 }

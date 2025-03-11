@@ -20,8 +20,6 @@ public class MissionRequestDTO {
     public static class ChallengeMissionDTO{
 
         @NotNull
-        Long userId;
-        @NotNull
         Long missionId;
     }
 }

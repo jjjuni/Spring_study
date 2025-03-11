@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.domain.store.converter.StoreConverter;
 import umc.spring.domain.region.data.Region;
 import umc.spring.domain.store.data.Store;
@@ -26,7 +26,7 @@ public class StoreCommandServiceImpl implements StoreCommandService{
 
         Store newStore = StoreConverter.toStore(request);
         Region region = regionRepository.findById(request.getRegionId())
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.REGION_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.REGION_NOT_FOUND));
 
         newStore.setRegion(region);
 

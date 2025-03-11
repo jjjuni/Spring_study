@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import umc.spring.apiPayload.code.status.ErrorStatus;
-import umc.spring.apiPayload.exception.handler.ErrorHandler;
+import umc.spring.apiPayload.exception.ErrorException;
 import umc.spring.domain.review.converter.ReviewConverter;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.review.data.Review;
@@ -26,13 +26,11 @@ public class ReviewCommandServiceImpl implements ReviewCommandService{
 
     @Override
     @Transactional
-    public Review addReview(ReviewRequestDTO.AddReviewDTO request) {
+    public Review addReview(ReviewRequestDTO.AddReviewDTO request, User user) {
 
         Review newReview = ReviewConverter.toReview(request);
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.USER_NOT_FOUND));
         Store store = storeRepository.findById(request.getStoreId())
-                .orElseThrow(() -> new ErrorHandler(ErrorStatus.STORE_NOT_FOUND));
+                .orElseThrow(() -> new ErrorException(ErrorStatus.STORE_NOT_FOUND));
 
         newReview.setUser(user);
         newReview.setStore(store);
