@@ -37,4 +37,12 @@ public class UserConverter {
                 .userPreferList(new ArrayList<>())
                 .build();
     }
+
+    public static UserResponseDTO.ChangeRoleResultDTO toChangeRoleResultDTO(User user){
+        return UserResponseDTO.ChangeRoleResultDTO.builder()
+                .userId(user.getId())
+                .role(user.getRole())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }

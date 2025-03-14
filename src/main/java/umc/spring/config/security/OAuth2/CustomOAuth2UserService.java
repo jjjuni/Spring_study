@@ -34,6 +34,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+
+
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -93,7 +95,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             .gender(Gender.NONE)
                             .address("소셜로그인")
                             .specAddress("소셜로그인")
-                            .role(Role.USER)
+                            .role(Role.UNKNOWN)
                             .socialType(socialType)
                             .build();
                 });

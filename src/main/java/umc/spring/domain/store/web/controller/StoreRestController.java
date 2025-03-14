@@ -33,13 +33,12 @@ public class StoreRestController {
     // PostMapping
     private final StoreCommandService storeCommandService;
 
-    // 추후에 path 및 body 수정 필요
+    // 가게 추가 API
     @PostMapping("")
     public ApiResponse<StoreResponseDTO.AddStoreResultDTO> join(@RequestBody @Valid StoreRequestDTO.AddStoreDTO request){
         Store store = storeCommandService.addStore(request);
         return ApiResponse.onSuccess(StoreConverter.toAddStoreResultDTO(store));
     }
-
 
     // GetMapping
     private final StoreQueryService storeQueryService;

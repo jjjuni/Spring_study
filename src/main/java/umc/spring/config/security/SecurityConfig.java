@@ -70,7 +70,9 @@ public class SecurityConfig {
                         // 스웨거는 권한 없이 접근 가능하도록 설정
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**").permitAll()
                         // 특정 권한이 있어야만 특정 API에 접근할 수 있도록 설정
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        // 가게 등록 API 는 ROLE이 STORE인 회원만 가능
+                        .requestMatchers("/store").hasRole("STORE")
                         // 특정 API들은 별도의 인증/인가 과정 없이도 접근이 가능하도록 설정
                         .requestMatchers(PermittedUriService.PERMITTED_URI).permitAll()
 

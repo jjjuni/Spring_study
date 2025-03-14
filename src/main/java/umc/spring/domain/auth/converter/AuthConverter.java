@@ -9,6 +9,7 @@ public class AuthConverter {
         return AuthResponseDTO.UserInfoDTO.builder()
                 .name(user.getName())
                 .email(user.getEmail())
+                .role(user.getRole())
                 .build();
     }
 }
