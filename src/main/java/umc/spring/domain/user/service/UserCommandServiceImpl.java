@@ -11,6 +11,7 @@ import umc.spring.domain.user.converter.UserConverter;
 import umc.spring.domain.user.converter.UserPreferConverter;
 import umc.spring.domain.foodcategory.data.FoodCategory;
 import umc.spring.domain.user.data.User;
+import umc.spring.domain.user.data.enums.Role;
 import umc.spring.domain.user.data.mapping.UserPrefer;
 import umc.spring.domain.foodcategory.repository.FoodCategoryRepository;
 import umc.spring.domain.user.repository.UserRepository;
@@ -51,5 +52,15 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     public User userInfo(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    public User changeRole(User user, Role role) {
+
+        User existingUser = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new ErrorException(ErrorStatus.USER_NOT_FOUND));
+
+        existingUser.setRole(role);
+
+        return userRepository.save(existingUser);
     }
 }

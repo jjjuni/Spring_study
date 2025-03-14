@@ -60,6 +60,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         jwtService.generateAccessToken(response, user);
 
         String redirectUrl = "http://localhost:3000";
+
+        if (user.getRole() == Role.UNKNOWN){
+            redirectUrl = "http://localhost:3000/signup";
+        }
+
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

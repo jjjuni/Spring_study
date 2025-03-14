@@ -9,7 +9,7 @@ public class PermittedUriService {
 
     public static final String[] PERMITTED_URI = {
             "/oauth2/**", "/api/auth/**",
-            "/login", "/login/oauth2/**",
+            "/login", "/login/oauth2/**", "/signup", "/auth/callback",
             "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-resources/**"};
 
 

@@ -40,4 +40,10 @@ public class UserRequestDTO {
         @NotNull
         Role role;
     }
+
+    @Getter
+    @Setter
+    public static class changeRoleDTO{
+        Role role;
+    }
 }

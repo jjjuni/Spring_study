@@ -5,7 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 import umc.spring.apiPayload.ApiResponse;
 import umc.spring.apiPayload.code.status.ErrorStatus;
@@ -20,16 +22,18 @@ import umc.spring.domain.token.data.enums.JwtRule;
 import umc.spring.domain.token.service.JwtService;
 import umc.spring.domain.user.data.User;
 import umc.spring.domain.user.repository.UserRepository;
+import umc.spring.domain.user.service.UserCommandService;
 import umc.spring.domain.user.service.UserCommandServiceImpl;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 public class AuthController {
     private final UserRepository userRepository;
-    private final UserCommandServiceImpl userCommandService;
+    private final UserCommandService userCommandService;
     private final JwtService jwtService;
     private final JwtUtil jwtUtil;
     private final CustomOAuth2UserService oAuth2UserService;
